@@ -1,13 +1,14 @@
+from random import randint
+
 import pygame
 from fysom import Fysom
-from random import randint
 
 infectedStates = ['day 1', 'day 2', 'day 3', 'day 4']
 
 colors = {
-    'healthy': pygame.color.Color(102, 153, 255),  # Light blue
-    'day 1': pygame.color.Color(255, 255, 153),  # Pale Yellow
-    'day 2': pygame.color.Color(255, 255, 102),  # Yellow
+    'healthy': pygame.color.Color(200, 200, 255),  # White
+    'day 1': pygame.color.Color(255, 255, 170),  # Pale Yellow
+    'day 2': pygame.color.Color(255, 255, 100),  # Yellow
     'day 3': pygame.color.Color(255, 102, 0),  # Orange
     'day 4': pygame.color.Color(255, 0, 0),  # Red
     'day 5': pygame.color.Color(128, 0, 0),  # Dark Red
@@ -43,17 +44,15 @@ class Cell:
             self.state.trigger(self.next_trigger)
         self.next_trigger = None
 
-    def proc_infection_chance(self):
-        infection_chance = 0
-
+    def infect_neighbors(self):
         for neighbor in self.neighbors:
-            if neighbor.state.current == 'day 3' or neighbor.state.current == 'day 4':
-                infection_chance = infection_chance + 1
+            if neighbor.state.current is 'healthy':
+                neighbor.proc_infection_chance()
 
-        for i in range(infection_chance):
-            roll = randint(0, 9)
-            if roll == 0:
-                self.next_trigger = 'get infected'
+    def proc_infection_chance(self):
+        roll = randint(0, 9)
+        if roll == 0:
+            self.next_trigger = 'get infected'
 
     def proc_final_day(self):
         roll = randint(0, 9)
@@ -70,35 +69,35 @@ class Cell:
         y = self.y // self.size
 
         try:
-            top_left = cell_dict[(x-1, y-1)]
+            top_left = cell_dict[(x - 1, y - 1)]
         except KeyError:
             top_left = None
         if top_left is not None:
             self.neighbors.append(top_left)
 
         try:
-            top = cell_dict[(x, y-1)]
+            top = cell_dict[(x, y - 1)]
         except KeyError:
             top = None
         if top is not None:
             self.neighbors.append(top)
 
         try:
-            top_right = cell_dict[(x+1, y-1)]
+            top_right = cell_dict[(x + 1, y - 1)]
         except KeyError:
             top_right = None
         if top_right is not None:
             self.neighbors.append(top_right)
 
         try:
-            left = cell_dict[(x-1, y)]
+            left = cell_dict[(x - 1, y)]
         except KeyError:
             left = None
         if left is not None:
             self.neighbors.append(left)
 
         try:
-            right = cell_dict[(x+1, y)]
+            right = cell_dict[(x + 1, y)]
         except KeyError:
             right = None
         if right is not None:

@@ -1,4 +1,5 @@
 from random import random
+
 from cell import Cell
 
 
@@ -27,13 +28,13 @@ class CellMaster:
     def next_state(self):
         for c in self.cells:
             cell = self.cells[c]
-            if cell.state.current == 'healthy':
-                cell.proc_infection_chance()
+            if cell.state.current == 'healthy' or cell.state.current == 'dead' or cell.state.current == 'immune':
+                continue
             elif cell.state.current == 'day 5':
                 cell.proc_final_day()
-            elif cell.state.current is not 'dead' and cell.state.current is not 'immune':
-                cell.proc_day_pass()
-
-
-
-
+                cell.infect_neighbors()
+            elif cell.state.current == 'day 1' or cell.state.current == 'day 2':
+                cell.state.trigger('day pass')
+            elif cell.state.current == 'day 3' or cell.state.current == 'day 4':
+                cell.state.trigger('day pass')
+                cell.infect_neighbors()

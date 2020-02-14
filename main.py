@@ -7,10 +7,11 @@ from states import States
 
 ########################################################################################################################
 
-rows = 100
-columns = 200
-size = 7
-cell_master = CellMaster(rows, columns, size, 0.05)
+rows = 10
+columns = 10
+size = 80
+initial_infection_rate = 0.1
+cell_master = CellMaster(rows, columns, size, initial_infection_rate)
 screen_size = (size*columns, size*rows)
 screen = pygame.display.set_mode(screen_size)
 
