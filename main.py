@@ -7,12 +7,12 @@ from states import States
 
 ########################################################################################################################
 
-screen_size = (1200, 1000)
-screen = pygame.display.set_mode(screen_size)
-
 rows = 100
-columns = 100
-cell_master = CellMaster(rows, columns)
+columns = 200
+size = 7
+cell_master = CellMaster(rows, columns, size, 0.05)
+screen_size = (size*columns, size*rows)
+screen = pygame.display.set_mode(screen_size)
 
 ########################################################################################################################
 
@@ -44,8 +44,8 @@ def render_screen():
     for c in cell_master.cells:
         cell = cell_master.cells[c]
         cell.day_trigger()
-        cell.update_sprite()
-        screen.blit(cell.image, (cell.rect.left, cell.rect.top))
+        cell.update_color()
+        pygame.draw.rect(screen, cell.color, pygame.Rect(cell.x, cell.y, cell.size, cell.size))
 
 
 ########################################################################################################################

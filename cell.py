@@ -1,20 +1,23 @@
-from os.path import join
-
 import pygame
 from fysom import Fysom
 from random import randint
 
 infectedStates = ['day 1', 'day 2', 'day 3', 'day 4']
 
-healthy_sprite = pygame.image.load(join('assets', 'healthy.png'))
-immune_sprite = pygame.image.load(join('assets', 'immune.png'))
-infected_sprite = pygame.image.load(join('assets', 'infected.png'))
-dead_sprite = pygame.image.load(join('assets', 'dead.png'))
-contagious_sprite = pygame.image.load(join('assets', 'contagious.png'))
+colors = {
+    'healthy': pygame.color.Color(102, 153, 255),  # Light blue
+    'day 1': pygame.color.Color(255, 255, 153),  # Pale Yellow
+    'day 2': pygame.color.Color(255, 255, 102),  # Yellow
+    'day 3': pygame.color.Color(255, 102, 0),  # Orange
+    'day 4': pygame.color.Color(255, 0, 0),  # Red
+    'day 5': pygame.color.Color(128, 0, 0),  # Dark Red
+    'dead': pygame.color.Color(0, 0, 0),  # Black
+    'immune': pygame.color.Color(51, 204, 51)  # Green
+}
 
 
-class Cell(pygame.sprite.Sprite):
-    def __init__(self, location):
+class Cell:
+    def __init__(self, location, size):
         self.state = Fysom({
             'initial': 'healthy',
             'events': [
@@ -29,12 +32,11 @@ class Cell(pygame.sprite.Sprite):
                 {'name': 'recover', 'src': 'day 5', 'dst': 'immune'}
             ],
         })
+        self.color = colors[self.state.current]
         self.next_trigger = None
-        self.image = healthy_sprite
         self.neighbors = []
-        self.rect = self.image.get_rect()
-        self.rect.left, self.rect.top = location[0] * 10, location[1] * 10
-        pygame.sprite.Sprite.__init__(self)
+        self.size = size
+        self.x, self.y = location[0] * self.size, location[1] * self.size
 
     def day_trigger(self):
         if self.next_trigger is not None:
@@ -64,8 +66,8 @@ class Cell(pygame.sprite.Sprite):
         self.next_trigger = 'day pass'
 
     def set_neighbors(self, cell_dict):
-        x = self.rect.left // 10
-        y = self.rect.top // 10
+        x = self.x // self.size
+        y = self.y // self.size
 
         try:
             top_left = cell_dict[(x-1, y-1)]
@@ -123,16 +125,5 @@ class Cell(pygame.sprite.Sprite):
         if bot_right is not None:
             self.neighbors.append(bot_right)
 
-    def update_sprite(self):
-        state = self.state.current
-        if state == 'healthy':
-            self.image = healthy_sprite
-        elif state == 'immune':
-            self.image = immune_sprite
-        elif state == 'dead':
-            self.image = dead_sprite
-        elif state == 'day 3' or state == 'day 4' or state == 'day 5':
-            self.image = contagious_sprite
-        elif state == 'day 1' or state == 'day 2':
-            self.image = infected_sprite
-
+    def update_color(self):
+        self.color = colors[self.state.current]

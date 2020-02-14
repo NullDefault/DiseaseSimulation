@@ -1,20 +1,20 @@
-from random import randint
+from random import random
 from cell import Cell
 
 
 class CellMaster:
 
-    def __init__(self, rows, columns):
-        self.cells = self.init_cells(rows, columns)
+    def __init__(self, rows, columns, size, chance):
+        self.cells = self.init_cells(rows, columns, size, chance)
 
     @staticmethod
-    def init_cells(rows, columns):
+    def init_cells(rows, columns, size, chance):
         cells = {}
         for c in range(columns):
             for r in range(rows):
-                cell = Cell((c, r))
-                roll = randint(0, 9)
-                if roll == 0:
+                cell = Cell((c, r), size)
+                roll = random()
+                if roll <= chance:
                     cell.state.trigger('get infected')
                 cells[(c, r)] = cell
 
