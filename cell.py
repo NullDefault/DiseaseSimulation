@@ -1,4 +1,4 @@
-from random import randint
+from random import random
 
 import pygame
 from fysom import Fysom
@@ -44,22 +44,32 @@ class Cell:
             self.state.trigger(self.next_trigger)
         self.next_trigger = None
 
-    def infect_neighbors(self):
+    def infect_neighbors(self, transmission_rate):
+        infection_count = 0
         for neighbor in self.neighbors:
             if neighbor.state.current is 'healthy':
-                neighbor.proc_infection_chance()
+                infected = neighbor.proc_infection_chance(transmission_rate)
+                if infected:
+                    infection_count = infection_count + 1
 
-    def proc_infection_chance(self):
-        roll = randint(0, 9)
-        if roll == 0:
+        return infection_count
+
+    def proc_infection_chance(self, transmission_rate):
+        roll = random()
+        if roll <= transmission_rate:
             self.next_trigger = 'get infected'
+            return True
+        else:
+            return False
 
-    def proc_final_day(self):
-        roll = randint(0, 9)
-        if roll == 0:
+    def proc_final_day(self, death_rate):
+        roll = random()
+        if roll <= death_rate:
             self.next_trigger = 'die'
+            return True
         else:
             self.next_trigger = 'recover'
+            return False
 
     def proc_day_pass(self):
         self.next_trigger = 'day pass'
