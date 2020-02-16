@@ -15,7 +15,7 @@ colors = {
 
 
 class Cell:
-    def __init__(self, location, size):
+    def __init__(self, location, size, disease):
         self.state = Fysom({
             'initial': 'healthy',
             'events': [
@@ -25,8 +25,8 @@ class Cell:
                 {'name': 'recover', 'src': 'contagious', 'dst': 'immune'},
             ],
         })
-        self.incubation_duration = 2
-        self.contagious_duration = 3
+        self.incubation_duration = disease['incubation duration']
+        self.contagious_duration = disease['contagious duration']
         self.color = colors[self.state.current]
         self.next_trigger = None
         self.neighbors = []
@@ -75,19 +75,6 @@ class Cell:
         else:
             self.next_trigger = 'recover'
             return False
-
-    def set_neighbors(self, cell_dict):
-        x = self.x // self.size
-        y = self.y // self.size
-
-        for c in (x-1, x, x+1):
-            for r in (y-1, y, y+1):
-                try:
-                    neighbor = cell_dict[(c, r)]
-                except KeyError:
-                    neighbor = None
-                if neighbor is not None and neighbor is not self:
-                    self.neighbors.append(neighbor)
 
     def update_color(self):
         self.color = colors[self.state.current]

@@ -12,7 +12,11 @@ rows = 120
 columns = 120
 size = 8
 
-cell_master = CellMaster(rows, columns, size, 0.1)
+disease = {
+    'incubation duration': 2,
+    'contagious duration': 3,
+}
+cell_master = CellMaster(rows, columns, size, disease, 0.1)
 
 screen_size = (size * columns + 300, size * rows)
 screen = pygame.display.set_mode(screen_size)
@@ -115,7 +119,7 @@ def main():
                             run_button.set_text("Pause")
 
                     elif event.ui_element == reset_button:
-                        cell_master.reset(rows, columns, size, initial_infection_slider.get_current_value())
+                        cell_master.reset(rows, columns, size, disease, initial_infection_slider.get_current_value())
 
             infection_slider_label.set_text("Initial Infection Rate: " +
                                             str(initial_infection_slider.get_current_value())[0:5])

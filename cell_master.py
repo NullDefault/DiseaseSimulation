@@ -5,41 +5,58 @@ from cell import Cell
 
 class CellMaster:
 
-    def __init__(self, rows, columns, size, chance):
+    def __init__(self, rows, columns, size, chance, disease):
         self.current_state_data = {
             'infected': 0,
             'contagious': 0,
             'dead': 0,
             'immune': 0
         }
-        self.cells = self.init_cells(rows, columns, size, chance)
+        self.cells = self.init_cells(rows, columns, size, chance, disease)
+        self.set_cell_neighbors()
 
-    def init_cells(self, rows, columns, size, chance):
+    def init_cells(self, rows, columns, size, disease, chance):
         infected_count = 0
         cells = {}
         for c in range(columns):
             for r in range(rows):
-                cell = Cell((c, r), size)
+                cell = Cell((c, r), size, disease)
                 roll = random()
                 if roll <= chance:
                     cell.state.trigger('get infected')
                     infected_count = infected_count + 1
                 cells[(c, r)] = cell
         self.current_state_data['infected'] = infected_count
-        for cell in cells:
-            c = cells[cell]
-            c.set_neighbors(cells)
 
         return cells
 
-    def reset(self, rows, columns, size, chance):
+    def set_cell_neighbors(self):
+        for cell in self.cells:
+            c = self.cells[cell]
+            self.set_neighbors(c)
+
+    def set_neighbors(self, cell):
+        x = cell.x // cell.size
+        y = cell.y // cell.size
+
+        for c in (x-1, x, x+1):
+            for r in (y-1, y, y+1):
+                try:
+                    neighbor = self.cells[(c, r)]
+                except KeyError:
+                    neighbor = None
+                if neighbor is not None and neighbor is not self:
+                    cell.neighbors.append(neighbor)
+
+    def reset(self, rows, columns, size, disease, chance):
         self.current_state_data = {
             'infected': 0,
             'contagious': 0,
             'dead': 0,
             'immune': 0
         }
-        self.cells = self.init_cells(rows, columns, size, chance)
+        self.cells = self.init_cells(rows, columns, size, disease, chance)
+        self.set_cell_neighbors()
 
     def next_state(self, transmission_rate, death_rate):
         state_has_changed = False
