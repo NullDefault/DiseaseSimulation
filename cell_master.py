@@ -47,37 +47,30 @@ class CellMaster:
             cell = self.cells[c]
             if cell.state.current == 'healthy' or cell.state.current == 'dead' or cell.state.current == 'immune':
                 continue
-            elif cell.state.current == 'day 5':
-                if not state_has_changed:
-                    state_has_changed = True
-                dead = cell.proc_final_day(death_rate)
-                new_infections = cell.infect_neighbors(transmission_rate)
 
-                if dead:
-                    self.current_state_data['contagious'] = self.current_state_data['contagious'] - 1
-                    self.current_state_data['dead'] = self.current_state_data['dead'] + 1
-                else:
-                    self.current_state_data['contagious'] = self.current_state_data['contagious'] - 1
-                    self.current_state_data['immune'] = self.current_state_data['immune'] + 1
+            elif cell.state.current == 'incubation':
+                if not state_has_changed:
+                    state_has_changed = True
+                incubation_complete = cell.incubate()
+                if incubation_complete:
+                    self.current_state_data['contagious'] = self.current_state_data['contagious'] + 1
 
-                self.current_state_data['infected'] = self.current_state_data['infected'] + new_infections
-
-            elif cell.state.current == 'day 1':
+            elif cell.state.current == 'contagious':
                 if not state_has_changed:
                     state_has_changed = True
-                cell.state.trigger('day pass')
-            elif cell.state.current == 'day 2':
-                if not state_has_changed:
-                    state_has_changed = True
-                cell.state.trigger('day pass')
-                self.current_state_data['contagious'] = self.current_state_data['contagious'] + 1
-            elif cell.state.current == 'day 3' or cell.state.current == 'day 4':
-                if not state_has_changed:
-                    state_has_changed = True
-                cell.state.trigger('day pass')
+                final_day_reached = cell.progress_disease()
                 new_infections = cell.infect_neighbors(transmission_rate)
 
                 self.current_state_data['infected'] = self.current_state_data['infected'] + new_infections
+
+                if final_day_reached:
+                    dead = cell.proc_final_day(death_rate)
+                    if dead:
+                        self.current_state_data['contagious'] = self.current_state_data['contagious'] - 1
+                        self.current_state_data['dead'] = self.current_state_data['dead'] + 1
+                    else:
+                        self.current_state_data['contagious'] = self.current_state_data['contagious'] - 1
+                        self.current_state_data['immune'] = self.current_state_data['immune'] + 1
 
         if state_has_changed:
             # Simulation is not done

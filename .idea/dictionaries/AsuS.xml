@@ -2,6 +2,7 @@
   <dictionary name="AsuS">
     <words>
       <w>proc</w>
+      <w>pygame</w>
       <w>rects</w>
     </words>
   </dictionary>

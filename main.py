@@ -8,9 +8,9 @@ from states import States
 pygame.init()
 ########################################################################################################################
 # Init Vars
-rows = 100
-columns = 100
-size = 10
+rows = 120
+columns = 120
+size = 8
 
 cell_master = CellMaster(rows, columns, size, 0.1)
 
@@ -100,8 +100,10 @@ def main():
 
             if event.type == pygame.USEREVENT:
                 if event.user_type == 'ui_button_pressed':
+
                     if event.ui_element == next_state_button:
                         simulation_state = States.CONTINUE_TO_NEXT_STATE
+
                     elif event.ui_element == run_button:
                         if auto_run:
                             auto_run = False
@@ -111,6 +113,7 @@ def main():
                             if simulation_state is not States.CONTINUE_TO_NEXT_STATE:
                                 simulation_state = States.CONTINUE_TO_NEXT_STATE
                             run_button.set_text("Pause")
+
                     elif event.ui_element == reset_button:
                         cell_master.reset(rows, columns, size, initial_infection_slider.get_current_value())
 
