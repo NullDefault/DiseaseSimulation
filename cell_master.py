@@ -10,7 +10,8 @@ class CellMaster:
             'infected': 0,
             'contagious': 0,
             'dead': 0,
-            'immune': 0
+            'immune': 0,
+            'day': 0
         }
         self.cells = self.init_cells(rows, columns, size, chance, disease)
         self.set_cell_neighbors()
@@ -53,12 +54,14 @@ class CellMaster:
             'infected': 0,
             'contagious': 0,
             'dead': 0,
-            'immune': 0
+            'immune': 0,
+            'day': 0
         }
         self.cells = self.init_cells(rows, columns, size, disease, chance)
         self.set_cell_neighbors()
 
     def next_state(self, transmission_rate, death_rate):
+        self.current_state_data['day'] = self.current_state_data['day'] + 1
         state_has_changed = False
         for c in self.cells:
             cell = self.cells[c]
@@ -98,12 +101,24 @@ class CellMaster:
 
     def create_state_text(self):
 
-        total_population = "Total Population: " + str(self.cells.__len__())
-        infected = "Infected: " + str(self.current_state_data['infected'])
-        contagious = "Contagious: " + str(self.current_state_data['contagious'])
-        dead = "Dead: " + str(self.current_state_data['dead'])
-        immune = "Immune: " + str(self.current_state_data['immune'])
+        t_p = self.cells.__len__()
+        i = self.current_state_data['infected']
+        i_percent = i / t_p * 100
+        c = self.current_state_data['contagious']
+        c_percent = c / t_p * 100
+        d = self.current_state_data['dead']
+        d_percent = d / t_p * 100
+        im = self.current_state_data['immune']
+        im_percent = im / t_p * 100
 
-        state_text = total_population + '<br><br>' + infected + '<br><br>' + contagious + '<br><br>' + dead + '<br><br>' + immune
+        total_population = "Total Population: " + str(t_p)
+        infected = "Affected: " + str(i) + " ("+str(i_percent)[0:4]+"% of Total)"
+        contagious = "Contagious: " + str(c) + " ("+str(c_percent)[0:4]+"% of Total)"
+        dead = "Dead: " + str(d) + " ("+str(d_percent)[0:4]+"% of Total)"
+        immune = "Immune: " + str(im) + " ("+str(im_percent)[0:4]+"% of Total)"
+        day = "Day: "+str(self.current_state_data['day'])
+
+        state_text = total_population + '<br><br>' + infected + '<br><br>' + contagious + '<br><br>' + dead + \
+                     '<br><br>' + immune + '<br><br>' + day
 
         return state_text
