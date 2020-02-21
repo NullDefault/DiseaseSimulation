@@ -1,5 +1,5 @@
 # Disease Simulation
-A Game of Life based simulation of how a disease progresses through a population. Inspired by the Corvid19 outbreak.
+A Game of Life based simulation of how a disease progresses through a population.
 ## Table of Contents
 * [General info](#general-info)
 * [Features](#features)
