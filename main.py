@@ -182,6 +182,9 @@ def process_ui_event(event, simulation_state, auto_run):
             run_button.set_text("Pause")
 
     elif event.ui_element == reset_button:
+        if auto_run:
+            auto_run = False
+            run_button.set_text("Run")
         disease = {
             'incubation duration': floor(incubation_duration_slider.get_current_value()),
             'contagious duration': floor(contagious_duration_slider.get_current_value()),
