@@ -13,62 +13,54 @@ class CellMaster:
             'immune': 0,
             'day': 0
         }
-        self.cells = self.init_cells(rows, columns, size, chance, disease)
+        self.cell_dictionary, self.active_cells = self.init_cells(rows, columns, size, chance, disease)
         self.set_cell_neighbors()
 
+    def get_cell(self, cell_address):
+        return self.cell_dictionary[cell_address]
+
     def init_cells(self, rows, columns, size, disease, chance):
-        infected_count = 0
         cells = {}
+        infected = {}
         for c in range(columns):
             for r in range(rows):
                 cell = Cell((c, r), size, disease)
                 roll = random()
                 if roll <= chance:
                     cell.state.trigger('get infected')
-                    infected_count = infected_count + 1
-                cells[(c, r)] = cell
-        self.current_state_data['infected'] = infected_count
+                    infected[(c, r)] = cell
 
-        return cells
+                cells[(c, r)] = cell
+        self.current_state_data['infected'] = infected.__len__()
+
+        return cells, infected
 
     def set_cell_neighbors(self):
-        for cell in self.cells:
-            c = self.cells[cell]
+        for cell in self.cell_dictionary:
+            c = self.get_cell(cell)
             self.set_neighbors(c)
 
     def set_neighbors(self, cell):
-        x = cell.x // cell.size
-        y = cell.y // cell.size
+        x, y = cell.dictionary_address
 
         for c in (x-1, x, x+1):
             for r in (y-1, y, y+1):
                 try:
-                    neighbor = self.cells[(c, r)]
+                    cell_address = c, r
+                    neighbor = self.get_cell(cell_address)
                 except KeyError:
                     neighbor = None
                 if neighbor is not None and neighbor is not self:
                     cell.neighbors.append(neighbor)
 
-    def reset(self, rows, columns, size, disease, chance):
-        self.current_state_data = {
-            'infected': 0,
-            'contagious': 0,
-            'dead': 0,
-            'immune': 0,
-            'day': 0
-        }
-        self.cells = self.init_cells(rows, columns, size, disease, chance)
-        self.set_cell_neighbors()
-
     def next_state(self, transmission_rate, death_rate):
         self.current_state_data['day'] = self.current_state_data['day'] + 1
         state_has_changed = False
-        for c in self.cells:
-            cell = self.cells[c]
-            if cell.state.current == 'healthy' or cell.state.current == 'dead' or cell.state.current == 'immune':
-                continue
 
-            elif cell.state.current == 'incubation':
+        for c in list(self.active_cells.keys()):
+            cell = self.get_cell(c)
+
+            if cell.state.current == 'incubation':
                 if not state_has_changed:
                     state_has_changed = True
                 incubation_complete = cell.incubate()
@@ -80,10 +72,11 @@ class CellMaster:
                     state_has_changed = True
                 final_day_reached = cell.progress_disease()
                 new_infections = cell.infect_neighbors(transmission_rate)
-
-                self.current_state_data['infected'] = self.current_state_data['infected'] + new_infections
+                for i in new_infections:
+                    self.active_cells[i.dictionary_address] = i
 
                 if final_day_reached:
+                    del self.active_cells[c]  # Remove Cell From Active Cell List
                     dead = cell.proc_final_day(death_rate)
                     if dead:
                         self.current_state_data['contagious'] = self.current_state_data['contagious'] - 1
@@ -91,6 +84,8 @@ class CellMaster:
                     else:
                         self.current_state_data['contagious'] = self.current_state_data['contagious'] - 1
                         self.current_state_data['immune'] = self.current_state_data['immune'] + 1
+
+        self.current_state_data['infected'] = self.active_cells.__len__()
 
         if state_has_changed:
             # Simulation is not done
@@ -101,7 +96,7 @@ class CellMaster:
 
     def create_state_text(self):
 
-        t_p = self.cells.__len__()
+        t_p = self.cell_dictionary.__len__()
         i = self.current_state_data['infected']
         i_percent = i / t_p * 100
         c = self.current_state_data['contagious']

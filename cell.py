@@ -33,6 +33,10 @@ class Cell:
         self.size = size
         self.x, self.y = location[0] * self.size, location[1] * self.size
 
+    @property
+    def dictionary_address(self):
+        return self.x // self.size, self.y // self.size
+
     def day_trigger(self):
         if self.next_trigger is not None:
             self.state.trigger(self.next_trigger)
@@ -50,14 +54,14 @@ class Cell:
             return True
 
     def infect_neighbors(self, transmission_rate):
-        infection_count = 0
+        infections = []
         for neighbor in self.neighbors:
             if neighbor.state.current is 'healthy':
                 infected = neighbor.proc_infection_chance(transmission_rate)
                 if infected:
-                    infection_count = infection_count + 1
+                    infections.append(neighbor)
 
-        return infection_count
+        return infections
 
     def proc_infection_chance(self, transmission_rate):
         roll = random()

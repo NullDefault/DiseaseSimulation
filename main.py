@@ -11,12 +11,11 @@ pygame.init()
 # Init Vars
 rows = 100
 columns = 100
-size = 10
+size = 1
 default_disease = {
     'incubation duration': 2,
     'contagious duration': 3,
 }
-cell_master = CellMaster(rows, columns, size, default_disease, 0.1)
 screen_size = (size * columns + 300, size * rows)
 screen = pygame.display.set_mode(screen_size)
 clock = pygame.time.Clock()
@@ -116,6 +115,7 @@ def main():
     running = True  # Keeps main running
     auto_run = False  # To run the simulation without repeated inputs from the user
     simulation_state = States.AWAIT_INPUT
+    cell_master = CellMaster(rows, columns, size, default_disease, 0.1)
 
     while running:
 
@@ -136,13 +136,14 @@ def main():
 
             if event.type == pygame.USEREVENT:
                 if event.user_type == 'ui_button_pressed':
-                    simulation_state, auto_run = process_ui_event(event, simulation_state, auto_run)
+                    simulation_state, auto_run, cell_master = \
+                        process_ui_event(event, simulation_state, auto_run, cell_master)
 
             update_labels()
             ui_manager.process_events(event)
 
         ui_manager.update(time_delta)
-        render_screen()
+        render_screen(cell_master)
         pygame.display.update()
 
         if simulation_state == States.CONTINUE_TO_NEXT_STATE:
@@ -157,9 +158,9 @@ def main():
 ########################################################################################################################
 # HELPER FUNCTIONS
 
-def render_screen():
-    for c in cell_master.cells:
-        cell = cell_master.cells[c]
+def render_screen(cell_master):
+    for c in cell_master.cell_dictionary:
+        cell = cell_master.get_cell(c)
         cell.day_trigger()
         cell.update_color()
         pygame.draw.rect(screen, cell.color, pygame.Rect(cell.x, cell.y, cell.size, cell.size))
@@ -167,7 +168,7 @@ def render_screen():
     ui_manager.get_sprite_group().draw(screen)
 
 
-def process_ui_event(event, simulation_state, auto_run):
+def process_ui_event(event, simulation_state, auto_run, cell_master):
     if event.ui_element == next_state_button:
         simulation_state = States.CONTINUE_TO_NEXT_STATE
 
@@ -189,9 +190,9 @@ def process_ui_event(event, simulation_state, auto_run):
             'incubation duration': floor(incubation_duration_slider.get_current_value()),
             'contagious duration': floor(contagious_duration_slider.get_current_value()),
         }
-        cell_master.reset(rows, columns, size, disease, initial_infection_slider.get_current_value())
+        cell_master = CellMaster(rows, columns, size, disease, initial_infection_slider.get_current_value())
 
-    return simulation_state, auto_run
+    return simulation_state, auto_run, cell_master
 
 
 def update_labels():
