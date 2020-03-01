@@ -11,7 +11,7 @@ pygame.init()
 # Init Vars
 rows = 100
 columns = 100
-size = 1
+size = 10
 default_disease = {
     'incubation duration': 2,
     'contagious duration': 3,
