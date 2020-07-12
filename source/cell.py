@@ -56,7 +56,7 @@ class Cell:
     def infect_neighbors(self, transmission_rate):
         infections = []
         for neighbor in self.neighbors:
-            if neighbor.state.current is 'healthy':
+            if neighbor.state.current == 'healthy':
                 infected = neighbor.proc_infection_chance(transmission_rate)
                 if infected:
                     infections.append(neighbor)

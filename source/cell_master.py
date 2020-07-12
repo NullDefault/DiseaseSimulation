@@ -1,6 +1,6 @@
 from random import random
 
-from cell import Cell
+from source.cell import Cell
 
 
 class CellMaster:

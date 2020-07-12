@@ -1,9 +1,10 @@
+from math import floor
+
 import pygame
 import pygame_gui
 
-from math import floor
-from cell_master import CellMaster
-from states import States
+from source.cell_master import CellMaster
+from source.states import States
 
 # Initialize Pygame
 pygame.init()
