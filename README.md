@@ -1,4 +1,5 @@
 # Disease Simulation
+<img src="https://img.shields.io/badge/python%20-%2314354C.svg?&style=for-the-badge&logo=python&logoColor=white"/></br>
 A Game of Life based simulation of how a disease progresses through a population.
 ## Table of Contents
 * [General info](#general-info)
